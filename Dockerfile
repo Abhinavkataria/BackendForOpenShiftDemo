@@ -2,6 +2,7 @@
 
 # Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+EXPOSE 5000
 WORKDIR /app
 
 # Copy csproj and restore dependencies
