@@ -1,27 +1,25 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# Build Stage
+# Start with the official .NET SDK image
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-EXPOSE 5000
 WORKDIR /app
 
-# Copy csproj and restore dependencies
+# Copy the project file and restore dependencies
 COPY *.csproj .
 RUN dotnet restore
 
-# Copy the entire project and build
+# Copy the remaining source code and build the application
 COPY . .
-RUN dotnet build -c Release --no-restore
+RUN dotnet publish -c Release -o out
 
-# Publish the application
-RUN dotnet publish -c Release -o out --no-restore
-
-# Runtime Stage
+# Create the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
+COPY --from=build /app/out ./
 
-# Copy the published output from the build stage
-COPY --from=build /app/out .
+# Set the ASP.NET Core environment variables
+ENV ASPNETCORE_ENVIRONMENT Production
+
+# Expose port 80 for the application
+EXPOSE 80
 
 # Set the entry point for the container
 ENTRYPOINT ["dotnet", "BackendForOpenShiftDemo.dll"]
