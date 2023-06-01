@@ -6,6 +6,7 @@ WORKDIR /app
 COPY *.csproj .
 RUN dotnet restore
 
+
 # Copy the remaining source code and build the application
 COPY . .
 RUN dotnet publish -c Release -o out
